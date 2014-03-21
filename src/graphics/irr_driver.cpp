@@ -1243,7 +1243,11 @@ static void compressTexture(video::ITexture* in)
     memcpy(data, in->lock(), w * h * 4);
     in->unlock();
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)data);
+    if (in->hasAlpha())
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)data);
+    else
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGB_S3TC_DXT1_EXT, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid*)data);
+    glGenerateMipmap(GL_TEXTURE_2D);
     delete[] data;
 }
 
