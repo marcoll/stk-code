@@ -1244,6 +1244,7 @@ static void compressTexture(video::ITexture* in)
     in->unlock();
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
     glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)data);
+    delete[] data;
 }
 
 // ----------------------------------------------------------------------------
