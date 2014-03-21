@@ -27,7 +27,7 @@ vec3 DecodeNormal(vec2 n)
 }
 
 void main() {
-	float z = texture(dtex, uv).x;
+	float z = texture(dtex, uv).z;
 	vec4 xpos = 2.0 * vec4(uv, z, 1.0) - 1.0;
 	xpos = invproj * xpos;
 	xpos.xyz /= xpos.w;

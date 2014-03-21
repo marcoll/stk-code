@@ -678,6 +678,8 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
                            int cam)
 {
     m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
+    if (!irr_driver->stencilSupported())
+        return;
 
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP1), false, false);
     glClearColor(0, 0, 0, 0);
@@ -761,10 +763,19 @@ static void renderPointLights(unsigned count)
     glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(LightShader::PointLightInfo), PointLightsInfo);
 
     setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    if (irr_driver->stencilSupported())
+    {
+        setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+        ChangeTextureSwizzle(GL_RED, GL_RED, GL_RED, GL_RED);
+    }
+    else
+        setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+
     LightShader::PointLightShader::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 200, 0, 1);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
+    if (irr_driver->stencilSupported())
+        ChangeTextureSwizzle();
 }
 
 void IrrDriver::renderLights(const core::aabbox3df& cambox,
@@ -1336,6 +1347,8 @@ void IrrDriver::renderSkybox()
         generateSkyboxCubemap();
 	glBindVertexArray(cubevao);
 	glDisable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
 	assert(SkyboxTextures.size() == 6);
 	core::matrix4 transform = irr_driver->getProjViewMatrix();
 	core::matrix4 translate;
@@ -1364,6 +1377,8 @@ void IrrDriver::renderSkybox()
 void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
                                    int cam)
 {
+    if (!irr_driver->stencilSupported())
+        return;
     irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_TMP4), true, false);
     irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_DISPLACE), true, false);
 

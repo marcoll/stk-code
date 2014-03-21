@@ -265,19 +265,20 @@ void renderColorLevel(ITexture *in)
 
 	glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    if (irr_driver->stencilSupported())
+        setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    else
+    {
+        setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+        ChangeTextureSwizzle(GL_BLUE, GL_BLUE, GL_BLUE, GL_BLUE);
+    }
 	glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
     glUniform1i(FullScreenShader::ColorLevelShader::uniform_dtex, 1);
     glUniformMatrix4fv(FullScreenShader::ColorLevelShader::uniform_invprojm, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
+    if (!irr_driver->stencilSupported())
+        ChangeTextureSwizzle();
 }
 
 void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff)
@@ -295,11 +296,6 @@ void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSH
     FullScreenShader::DiffuseEnvMapShader::setUniforms(TVM, bSHCoeff, gSHCoeff, rSHCoeff, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
 }
 
 void PostProcessing::renderSunlight()
@@ -314,10 +310,18 @@ void PostProcessing::renderSunlight()
   glUseProgram(FullScreenShader::SunLightShader::Program);
   glBindVertexArray(FullScreenShader::SunLightShader::vao);
   setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-  setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+  if (irr_driver->stencilSupported())
+  {
+      setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+      ChangeTextureSwizzle(GL_RED, GL_RED, GL_RED, GL_RED);
+  }
+  else
+      setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+
   FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  glBindVertexArray(0);
+  if (irr_driver->stencilSupported())
+      ChangeTextureSwizzle();
 }
 
 void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &sun_ortho_matrix, GLuint depthtex)
@@ -332,7 +336,6 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
     glUseProgram(FullScreenShader::ShadowedSunLightShader::Program);
     glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
     setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D_ARRAY, depthtex);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -341,9 +344,18 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    if (irr_driver->stencilSupported())
+    {
+        setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+        ChangeTextureSwizzle(GL_RED, GL_RED, GL_RED, GL_RED);
+    }
+    else
+        setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+
     FullScreenShader::ShadowedSunLightShader::setUniforms(sun_ortho_matrix, cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
+    if (irr_driver->stencilSupported())
+        ChangeTextureSwizzle();
 }
 
 
@@ -504,16 +516,20 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 	glUseProgram(FullScreenShader::SSAOShader::Program);
 	glBindVertexArray(FullScreenShader::SSAOShader::vao);
     setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_LINEAR, GL_LINEAR);
     setTexture(2, getTextureGLuint(noise_tex), GL_NEAREST, GL_NEAREST);
+    if (irr_driver->stencilSupported())
+    {
+        setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_LINEAR, GL_LINEAR);
+        ChangeTextureSwizzle(GL_RED, GL_RED, GL_RED, GL_RED);
+    }
+    else
+        setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_LINEAR, GL_LINEAR);
 
 	FullScreenShader::SSAOShader::setUniforms(projm, invprojm, 0, 1, 2);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
+    if (irr_driver->stencilSupported())
+        ChangeTextureSwizzle();
 }
 
 void PostProcessing::renderFog(const core::matrix4 &ipvmat)
@@ -541,15 +557,19 @@ void PostProcessing::renderFog(const core::matrix4 &ipvmat)
 	glUseProgram(FullScreenShader::FogShader::Program);
 	glBindVertexArray(FullScreenShader::FogShader::vao);
 
-    setTexture(0, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    if (irr_driver->stencilSupported())
+    {
+        setTexture(0, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+        ChangeTextureSwizzle(GL_RED, GL_RED, GL_RED, GL_RED);
+    }
+    else
+        setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+
 	FullScreenShader::FogShader::setUniforms(ipvmat, fogmax, startH, endH, start, end, col, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
+    if (irr_driver->stencilSupported())
+        ChangeTextureSwizzle();
 }
 
 void PostProcessing::renderMotionBlur(unsigned cam, ITexture *in, ITexture *out)

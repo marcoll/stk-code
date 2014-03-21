@@ -18,7 +18,7 @@ void main()
 {
 	vec4 col = texture(tex, uv);
 
-    float curdepth = texture(dtex, uv).x;
+    float curdepth = texture(dtex, uv).z;
     vec4 FragPos = invprojm * (2.0 * vec4(uv, curdepth, 1.0f) - 1.0f);
     FragPos /= FragPos.w;
     float depth = clamp(FragPos.z / 180, 0, 1);

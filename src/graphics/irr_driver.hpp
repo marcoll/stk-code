@@ -111,6 +111,7 @@ private:
 
     /** The main MRT setup. */
     core::array<video::IRenderTarget> m_mrt;
+    bool _stencilSupported;
 
     /** Matrixes used in several places stored here to avoid recomputation. */
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
@@ -157,6 +158,16 @@ public:
             return 100 + (GLMinorVersion + 3) * 10;
         else
             return 120;
+    }
+
+    bool stencilSupported() const
+    {
+        return _stencilSupported;
+    }
+
+    void setStencilSupported(bool v)
+    {
+      _stencilSupported = v;
     }
 
 private:

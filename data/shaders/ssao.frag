@@ -35,7 +35,7 @@ vec3 DecodeNormal(vec2 n)
 void main(void)
 {
 	vec4 cur = texture(ntex, uv);
-	float curdepth = texture(dtex, uv).x;
+	float curdepth = texture(dtex, uv).z;
 	vec4 FragPos = invprojm * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
 	FragPos /= FragPos.w;
 
@@ -60,7 +60,7 @@ void main(void)
 
 		bool isInsideTexture = (sampleProj.x > -1.) && (sampleProj.x < 1.) && (sampleProj.y > -1.) && (sampleProj.y < 1.);
 		// get the depth of the occluder fragment
-		float occluderFragmentDepth = texture(dtex, (sampleProj.xy * 0.5) + 0.5).x;
+		float occluderFragmentDepth = texture(dtex, (sampleProj.xy * 0.5) + 0.5).z;
 		// Position of the occluder fragment in worldSpace
 		vec4 occluderPos = invprojm * vec4(sampleProj.xy, 2.0 * occluderFragmentDepth - 1.0, 1.0f);
 		occluderPos /= occluderPos.w;

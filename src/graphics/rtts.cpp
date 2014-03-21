@@ -52,25 +52,19 @@ RTT::RTT()
     //
     // Optionally, the collapse ones use a smaller format.
 
-    bool stencil = true;
-    rtts[RTT_TMP1] = drv->addRenderTargetTexture(res, "rtt.tmp1", ECF_A8R8G8B8, stencil);
+    rtts[RTT_TMP1] = drv->addRenderTargetTexture(res, "rtt.tmp1", ECF_A8R8G8B8, true);
     if(!rtts[RTT_TMP1])
-    {
-        // Work around for intel hd3000 cards :(
-        stencil = false;
-        rtts[RTT_TMP1] = drv->addRenderTargetTexture(res, "rtt.tmp1", ECF_A8R8G8B8, stencil);
-        Log::error("rtts", "Stencils for rtt not available, most likely a driver bug.");
-        if(UserConfigParams::m_pixel_shaders)
-        {
-            Log::error("rtts", "This requires pixel shaders to be disabled.");
-            UserConfigParams::m_pixel_shaders = false;
-        }
-        irr_driver->disableGLSL();
-    }
+        irr_driver->setStencilSupported(false);
+    else
+        irr_driver->setStencilSupported(true);
+    bool stencil = irr_driver->stencilSupported();
     rtts[RTT_TMP2] = drv->addRenderTargetTexture(res, "rtt.tmp2", ECF_A8R8G8B8, stencil);
     rtts[RTT_TMP3] = drv->addRenderTargetTexture(res, "rtt.tmp3", ECF_A8R8G8B8, stencil);
     rtts[RTT_TMP4] = drv->addRenderTargetTexture(res, "rtt.tmp4", ECF_R8, stencil);
-	rtts[RTT_NORMAL_AND_DEPTH] = drv->addRenderTargetTexture(res, "rtt.normal_and_depth", ECF_G16R16F, stencil);
+    if (stencil)
+        rtts[RTT_NORMAL_AND_DEPTH] = drv->addRenderTargetTexture(res, "rtt.normal_and_depth", ECF_G16R16F, stencil);
+    else
+        rtts[RTT_NORMAL_AND_DEPTH] = drv->addRenderTargetTexture(res, "rtt.normal_and_depth", ECF_A16B16G16R16F, stencil);
     rtts[RTT_COLOR] = drv->addRenderTargetTexture(res, "rtt.color", ECF_A16B16G16R16F, stencil);
 
     rtts[RTT_HALF1] = drv->addRenderTargetTexture(half, "rtt.half1", ECF_A8R8G8B8, stencil);

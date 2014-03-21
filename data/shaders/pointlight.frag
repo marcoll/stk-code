@@ -21,7 +21,7 @@ vec3 DecodeNormal(vec2 n)
 
 void main() {
 	vec2 texc = gl_FragCoord.xy / screen;
-	float z = texture(dtex, texc).x;
+	float z = texture(dtex, texc).z;
 	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, texc).xy - 1.));
 
 	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;

@@ -4,7 +4,11 @@ uniform sampler2D normalMap;
 in vec3 tangent;
 in vec3 bitangent;
 in vec2 uv;
+#ifdef _HAS_STENCIL_SUPPORT_
 out vec2 EncodedNormal;
+#else
+out vec3 EncodedNormal;
+#endif
 #else
 varying vec3 tangent;
 varying vec3 bitangent;
@@ -29,5 +33,8 @@ void main()
 	vec3 Frag_bitangent = cross(Frag_normal, Frag_tangent);
 
 	vec3 FragmentNormal = TS_normal.x * Frag_tangent + TS_normal.y * Frag_bitangent - TS_normal.z * Frag_normal;	
-	EncodedNormal = 0.5 * EncodeNormal(normalize(FragmentNormal)) + 0.5;
+    EncodedNormal.xy = 0.5 * EncodeNormal(normalize(FragmentNormal)) + 0.5;
+#ifndef _HAS_STENCIL_SUPPORT_
+    EncodedNormal.z = gl_FragCoord.z;
+#endif
 }

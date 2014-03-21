@@ -210,8 +210,11 @@ void initGL()
 static GLuint LoadShader(const char * file, unsigned type)
 {
 	GLuint Id = glCreateShader(type);
-    char versionString[20];
-    sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
+    char versionString[50];
+    if (irr_driver->stencilSupported())
+        sprintf(versionString, "#version %d\n#define _HAS_STENCIL_SUPPORT_\n", irr_driver->getGLSLVersion());
+    else
+        sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
     std::string Code = versionString;
 	std::ifstream Stream(file, std::ios::in);
 	if (Stream.is_open())
@@ -356,6 +359,12 @@ GLuint getDepthTexture(irr::video::ITexture *tex)
 {
     assert(tex->isRenderTarget());
     return static_cast<irr::video::COpenGLFBOTexture*>(tex)->DepthBufferTexture;
+}
+
+void ChangeTextureSwizzle(GLint slot0, GLint slot1, GLint slot2, GLint slot3)
+{
+    GLint swizzleMask[] = { slot0, slot1, slot2, slot3 };
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
 }
 
 void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF)

@@ -92,6 +92,7 @@ extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 
 GLuint getTextureGLuint(irr::video::ITexture *tex);
 GLuint getDepthTexture(irr::video::ITexture *tex);
+void ChangeTextureSwizzle(GLint slot0 = GL_RED, GLint slot1 = GL_GREEN, GLint slot2 = GL_BLUE, GLint slot3 = GL_ALPHA);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
 	const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,

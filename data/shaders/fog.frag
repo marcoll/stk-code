@@ -19,7 +19,7 @@ varying vec2 uv;
 
 void main()
 {
-	float z = texture(tex, uv).x;
+	float z = texture(tex, uv).z;
 
 	vec3 tmp = vec3(uv, z);
 	tmp = tmp * 2.0 - 1.0;
