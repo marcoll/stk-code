@@ -1355,8 +1355,8 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
             Log::error("irr_driver", m_texture_error_message.c_str());
         }
         Log::error("irr_driver", "Texture '%s' not found.", filename.c_str());
-    }
-    compressTexture(out);
+    } else
+        compressTexture(out);
 
     return out;
 }   // getTexture
