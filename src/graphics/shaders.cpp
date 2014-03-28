@@ -1762,12 +1762,13 @@ namespace FullScreenShader
 {
 	GLuint BloomShader::Program;
 	GLuint BloomShader::uniform_texture;
-	GLuint BloomShader::uniform_low;
+	GLuint BloomShader::uniform_low;    
 	GLuint BloomShader::vao;
 	void BloomShader::init()
 	{
 		Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloom.frag").c_str());
 		uniform_texture = glGetUniformLocation(Program, "tex");
 		uniform_low = glGetUniformLocation(Program, "low");
