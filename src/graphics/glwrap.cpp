@@ -59,6 +59,7 @@ PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
 PFNGLTEXIMAGE3DPROC glTexImage3D;
 PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
+PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 #endif
 
 static bool is_gl_init = false;
@@ -197,6 +198,7 @@ void initGL()
     glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture");
     glTexImage3D = (PFNGLTEXIMAGE3DPROC)IRR_OGL_LOAD_EXTENSION("glTexImage3D");
     glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)IRR_OGL_LOAD_EXTENSION("glCheckFramebufferStatus");
+    glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)IRR_OGL_LOAD_EXTENSION("glGenerateMipmap");
 #ifdef DEBUG
 	glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
 #endif
