@@ -1244,9 +1244,9 @@ static void compressTexture(video::ITexture* in)
     in->unlock();
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
     if (in->hasAlpha())
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)data);
     else
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid*)data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid*)data);
     glGenerateMipmap(GL_TEXTURE_2D);
     delete[] data;
 }
