@@ -383,6 +383,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    compressTexturesRGB(getMaterial(0).getTexture(0));
     texture = getTextureGLuint(getMaterial(0).getTexture(0));
 }
 

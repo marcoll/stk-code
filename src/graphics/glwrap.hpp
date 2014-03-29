@@ -151,6 +151,7 @@ GLint LoadProgram(Types ... args)
 
 GLuint getTextureGLuint(irr::video::ITexture *tex);
 GLuint getDepthTexture(irr::video::ITexture *tex);
+void compressTexturesRGB(irr::video::ITexture* in);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
     const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,

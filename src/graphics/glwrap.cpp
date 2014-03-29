@@ -311,6 +311,22 @@ void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum
     }
 }
 
+void compressTexturesRGB(video::ITexture* in)
+{
+    size_t w = in->getSize().Width, h = in->getSize().Height;
+    char *data = new char[w * h * 4];
+    memcpy(data, in->lock(), w * h * 4);
+    in->unlock();
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
+    if (in->hasAlpha())
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)data);
+    else
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid*)data);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+    delete[] data;
+}
+
 static void drawTexColoredQuad(const video::ITexture *texture, const video::SColor *col, float width, float height,
     float center_pos_x, float center_pos_y, float tex_center_pos_x, float tex_center_pos_y,
     float tex_width, float tex_height)

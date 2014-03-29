@@ -7,6 +7,8 @@
 
 class STKBillboard : public irr::scene::CBillboardSceneNode
 {
+private:
+    unsigned TexID;
 public:
 	STKBillboard(irr::scene::ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
 		const irr::core::vector3df& position, const irr::core::dimension2d<irr::f32>& size,

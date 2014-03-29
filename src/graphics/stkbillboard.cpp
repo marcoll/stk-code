@@ -26,6 +26,7 @@ STKBillboard::STKBillboard(irr::scene::ISceneNode* parent, irr::scene::ISceneMan
 {
 	if (!billboardvao)
 		createbillboardvao();
+    TexID = 0;
 }
 
 void STKBillboard::render()
@@ -34,8 +35,13 @@ void STKBillboard::render()
         return;
 	core::vector3df pos = getAbsolutePosition();
 	glBindVertexArray(billboardvao);
-    GLuint texid = getTextureGLuint(Material.getTexture(0));
-	setTexture(0, texid, GL_LINEAR, GL_LINEAR);
+    if (!TexID)
+    {
+        compressTexturesRGB(Material.getTexture(0));
+        TexID = getTextureGLuint(Material.getTexture(0));
+    }
+
+    setTexture(0, TexID, GL_LINEAR, GL_LINEAR);
 	glUseProgram(MeshShader::BillboardShader::Program);
 	MeshShader::BillboardShader::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), pos, Size, 0);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
