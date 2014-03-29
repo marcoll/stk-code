@@ -7,11 +7,10 @@ vec3 getRGBFromCIEXxy(vec3 YxyColor)
     vec3 XYZ = vec3(YxyColor.y * Yovery, YxyColor.x, (1. - YxyColor.y - YxyColor.z) * Yovery);
 
     mat3 XYZ2sRGB = mat3(
-        vec3(3.2405, -.9693, .0556),
-        vec3(-1.5371, 1.8760, -.2040),
-        vec3(-.4985, .0416, 1.0572));
+        vec3(2.5651,-1.1665,-0.3986),
+        vec3(-1.0217, 1.9777, 0.0439),
+        vec3(0.0753, -0.2543, 1.1892));
 
-    vec3 sRGBColor = XYZ2sRGB * XYZ;
-    return vec3(pow(sRGBColor.x, 2.2), pow(sRGBColor.y, 2.2), pow(sRGBColor.z, 2.2));
+    return XYZ2sRGB * XYZ;
 }
 
