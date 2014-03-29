@@ -887,7 +887,7 @@ void PostProcessing::render()
         else if (irr_driver->getSSAOViz())
 			renderPassThrough(irr_driver->getRTT(RTT_SSAO));
         else
-            renderColorLevel(irr_driver->getRTT(RTT_COLOR));
+            renderColorLevel(in);
 			
         glDisable(GL_FRAMEBUFFER_SRGB);
     }
