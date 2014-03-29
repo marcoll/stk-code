@@ -11,6 +11,6 @@ vec3 getRGBFromCIEXxy(vec3 YxyColor)
         vec3(-1.0217, 1.9777, 0.0439),
         vec3(0.0753, -0.2543, 1.1892));
 
-    return XYZ2sRGB * XYZ;
+    return max(XYZ2sRGB * XYZ, vec3(0.));
 }
 

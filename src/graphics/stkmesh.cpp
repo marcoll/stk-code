@@ -106,6 +106,22 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 	return vao;
 }
 
+static void compressTexture(video::ITexture* in)
+{
+    size_t w = in->getSize().Width, h = in->getSize().Height;
+    char *data = new char[w * h * 4];
+    memcpy(data, in->lock(), w * h * 4);
+    in->unlock();
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
+    if (in->hasAlpha())
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)data);
+    else
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid*)data);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+    delete[] data;
+}
+
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 {
 	GLMesh result = {};
@@ -181,8 +197,11 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 	for (unsigned i = 0; i < 6; i++)
 	{
 		tex = mb->getMaterial().getTexture(i);
-		if (tex)
-			result.textures[i] = getTextureGLuint(tex);
+        if (tex)
+        {
+            compressTexture(tex);
+            result.textures[i] = getTextureGLuint(tex);
+        }
 		else
 			result.textures[i] = 0;
 	}

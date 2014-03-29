@@ -1236,21 +1236,6 @@ void IrrDriver::unsetTextureErrorMessage()
     m_texture_error_message = "";
 }   // unsetTextureErrorMessage
 
-static void compressTexture(video::ITexture* in)
-{
-    size_t w = in->getSize().Width, h = in->getSize().Height;
-    char *data = new char[w * h * 4];
-    memcpy(data, in->lock(), w * h * 4);
-    in->unlock();
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-    if (in->hasAlpha())
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)data);
-    else
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid*)data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    delete[] data;
-}
-
 // ----------------------------------------------------------------------------
 /** Loads a texture from a file and returns the texture object. This is just
  *  a convenient wrapper which loads the texture from a STK asset directory.
@@ -1360,8 +1345,7 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
             Log::error("irr_driver", m_texture_error_message.c_str());
         }
         Log::error("irr_driver", "Texture '%s' not found.", filename.c_str());
-    } else
-        compressTexture(out);
+    }
 
     return out;
 }   // getTexture
