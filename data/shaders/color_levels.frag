@@ -224,15 +224,8 @@ vec3 getRGBFromCIEXxy(vec3 YxyColor);
 void main()
 {
 	vec4 col = texture(tex, uv);
-	vec3 Yxy = getCIEYxy(col.xyz);
-	float luma = Yxy.x;
-	luma /= (luma + 1);
-	vec3 color = getRGBFromCIEXxy(vec3(luma, Yxy.yz));
-	FragColor = vec4(color, 1.);
 
-
-
-    /*float curdepth = texture(dtex, uv).x;
+    float curdepth = texture(dtex, uv).x;
     vec4 FragPos = invprojm * (2.0 * vec4(uv, curdepth, 1.0f) - 1.0f);
     FragPos /= FragPos.w;
     float depth = clamp(FragPos.z / 180, 0., 1.);
@@ -251,12 +244,12 @@ void main()
 	float outBlack = outlevel.x;
 	float outWhite = outlevel.y;
 
-	vec3 colSat = (pow(((col.rgb * 255.0) - inBlack) / (inWhite - inBlack),
+	vec3 colSat = (pow(max((col.rgb * 255.0) - inBlack, vec3(.1)) / (inWhite - inBlack),
                 vec3(1.0 / inGamma)) * (outWhite - outBlack) + outBlack) / 255.0;
 
     vec3 colFinal = colSat * depth + col.rgb * (1 - depth);
   
-	FragColor = vec4(colFinal * vignette, 1.0);*/
+	FragColor = vec4(colFinal * vignette, 1.0);
     //FragColor = vec4(vec3(depth), 1.0);
 }
 #endif

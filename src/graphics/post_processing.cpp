@@ -252,8 +252,10 @@ void renderBloomBlend(ITexture *in)
 static
 void renderColorLevel(ITexture *in)
 {
-	core::vector3df m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
-	core::vector2df m_outlevel = World::getWorld()->getTrack()->getColorLevelOut();
+    core::vector3df m_inlevel(0., .45, 180.);// = World::getWorld()->getTrack()->getColorLevelIn();
+    //printf("in level %f %f %f\n", m_inlevel.X, m_inlevel.Y, m_inlevel.Z);
+    core::vector2df m_outlevel(0., 255.);// = World::getWorld()->getTrack()->getColorLevelOut();
+    //printf("out level %f %f\n", m_outlevel.X, m_outlevel.Y, m_outlevel);
 
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
