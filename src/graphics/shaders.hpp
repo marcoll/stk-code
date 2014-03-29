@@ -431,7 +431,7 @@ class ColorLevelShader
 {
 public:
 	static GLuint Program;
-    static GLuint uniform_tex, uniform_invprojm,  uniform_dtex, uniform_inlevel, uniform_outlevel;
+    static GLuint uniform_tex, uniform_invprojm, uniform_dtex, uniform_inlevel, uniform_outlevel, uniform_logluminancetex;
 	static GLuint vao;
 
 	static void init();
@@ -606,6 +606,17 @@ public:
 
     static void init();
     static void setUniforms(const video::SColor &col, unsigned TU_tex);
+};
+
+class LogLuminanceShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(unsigned TU_tex);
 };
 
 class GodRayShader

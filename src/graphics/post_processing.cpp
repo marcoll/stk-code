@@ -252,10 +252,8 @@ void renderBloomBlend(ITexture *in)
 static
 void renderColorLevel(ITexture *in)
 {
-    core::vector3df m_inlevel(0., .45, 180.);// = World::getWorld()->getTrack()->getColorLevelIn();
-    //printf("in level %f %f %f\n", m_inlevel.X, m_inlevel.Y, m_inlevel.Z);
-    core::vector2df m_outlevel(0., 255.);// = World::getWorld()->getTrack()->getColorLevelOut();
-    //printf("out level %f %f\n", m_outlevel.X, m_outlevel.Y, m_outlevel);
+    core::vector3df m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
+    core::vector2df m_outlevel = World::getWorld()->getTrack()->getColorLevelOut();
 
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
@@ -273,6 +271,8 @@ void renderColorLevel(ITexture *in)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
     glUniform1i(FullScreenShader::ColorLevelShader::uniform_dtex, 1);
+    setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_LOGLUMINANCE)), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
+    glUniform1i(FullScreenShader::ColorLevelShader::uniform_logluminancetex, 2);
     glUniformMatrix4fv(FullScreenShader::ColorLevelShader::uniform_invprojm, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -625,6 +625,28 @@ static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
     glEnable(GL_DEPTH_TEST);
 }
 
+static void averageTexture(GLuint tex)
+{
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+static void computeLogLuminance(GLuint tex)
+{
+    glDisable(GL_DEPTH_TEST);
+    IVideoDriver * const drv = irr_driver->getVideoDriver();
+    drv->setRenderTarget(irr_driver->getRTT(RTT_LOGLUMINANCE), true, false);
+    glUseProgram(FullScreenShader::LogLuminanceShader::Program);
+    glBindVertexArray(FullScreenShader::LogLuminanceShader::vao);
+    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::LogLuminanceShader::setUniforms(0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    averageTexture(getTextureGLuint(irr_driver->getRTT(RTT_LOGLUMINANCE)));
+}
+
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
 void PostProcessing::render()
@@ -854,6 +876,7 @@ void PostProcessing::render()
             PROFILER_POP_CPU_MARKER();
         }
 
+        computeLogLuminance(getTextureGLuint(irr_driver->getRTT(RTT_COLOR)));
         // Final blit
 		// TODO : Use glBlitFramebuffer
         glEnable(GL_FRAMEBUFFER_SRGB);
@@ -864,7 +887,8 @@ void PostProcessing::render()
         else if (irr_driver->getSSAOViz())
 			renderPassThrough(irr_driver->getRTT(RTT_SSAO));
         else
-			renderColorLevel(in);
+            renderColorLevel(irr_driver->getRTT(RTT_COLOR));
+			
         glDisable(GL_FRAMEBUFFER_SRGB);
     }
 }   // render

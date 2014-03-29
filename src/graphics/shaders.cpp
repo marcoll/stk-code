@@ -314,6 +314,7 @@ void Shaders::loadShaders()
     FullScreenShader::MotionBlurShader::init();
     FullScreenShader::GodFadeShader::init();
     FullScreenShader::GodRayShader::init();
+    FullScreenShader::LogLuminanceShader::init();
 	MeshShader::ColorizeShader::init();
 	MeshShader::NormalMapShader::init();
 	MeshShader::ObjectPass1Shader::init();
@@ -1622,6 +1623,7 @@ namespace FullScreenShader
 	GLuint ColorLevelShader::vao;
     GLuint ColorLevelShader::uniform_invprojm;
     GLuint ColorLevelShader::uniform_dtex;
+    GLuint ColorLevelShader::uniform_logluminancetex;
 	void ColorLevelShader::init()
 	{
         Program = LoadProgram(
@@ -1634,6 +1636,7 @@ namespace FullScreenShader
 		uniform_inlevel = glGetUniformLocation(Program, "inlevel");
 		uniform_outlevel = glGetUniformLocation(Program, "outlevel");
         uniform_invprojm = glGetUniformLocation(Program, "invprojm");
+        uniform_logluminancetex = glGetUniformLocation(Program, "logluminancetex");
 		vao = createVAO(Program);
 	}
 
@@ -2146,6 +2149,24 @@ namespace FullScreenShader
     void GodRayShader::setUniforms(const core::vector2df &sunpos, unsigned TU_tex)
     {
         glUniform2f(uniform_sunpos, sunpos.X, sunpos.Y);
+        glUniform1i(uniform_tex, TU_tex);
+    }
+
+    GLuint LogLuminanceShader::Program;
+    GLuint LogLuminanceShader::uniform_tex;
+    GLuint LogLuminanceShader::vao;
+
+    void LogLuminanceShader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/logluminance.frag").c_str());
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        vao = createVAO(Program);
+    }
+
+    void LogLuminanceShader::setUniforms(unsigned TU_tex)
+    {
         glUniform1i(uniform_tex, TU_tex);
     }
 }
