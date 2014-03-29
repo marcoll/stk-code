@@ -53,7 +53,7 @@ RTT::RTT()
     // Optionally, the collapse ones use a smaller format.
 
     bool stencil = true;
-    rtts[RTT_TMP1] = drv->addRenderTargetTexture(res, "rtt.tmp1", ECF_A8R8G8B8, stencil);
+    rtts[RTT_TMP1] = drv->addRenderTargetTexture(res, "rtt.tmp1", ECF_A16B16G16R16F, stencil);
     if(!rtts[RTT_TMP1])
     {
         // Work around for intel hd3000 cards :(
@@ -67,33 +67,33 @@ RTT::RTT()
         }
         irr_driver->disableGLSL();
     }
-    rtts[RTT_TMP2] = drv->addRenderTargetTexture(res, "rtt.tmp2", ECF_A8R8G8B8, stencil);
-    rtts[RTT_TMP3] = drv->addRenderTargetTexture(res, "rtt.tmp3", ECF_A8R8G8B8, stencil);
-    rtts[RTT_TMP4] = drv->addRenderTargetTexture(res, "rtt.tmp4", ECF_R8, stencil);
+    rtts[RTT_TMP2] = drv->addRenderTargetTexture(res, "rtt.tmp2", ECF_A16B16G16R16F, stencil);
+    rtts[RTT_TMP3] = drv->addRenderTargetTexture(res, "rtt.tmp3", ECF_A16B16G16R16F, stencil);
+    rtts[RTT_TMP4] = drv->addRenderTargetTexture(res, "rtt.tmp4", ECF_R16F, stencil);
 	rtts[RTT_NORMAL_AND_DEPTH] = drv->addRenderTargetTexture(res, "rtt.normal_and_depth", ECF_G16R16F, stencil);
     rtts[RTT_COLOR] = drv->addRenderTargetTexture(res, "rtt.color", ECF_A16B16G16R16F, stencil);
     rtts[RTT_LOGLUMINANCE] = drv->addRenderTargetTexture(shadowsize0, "rtt.logluminance", ECF_A16B16G16R16F, false);
 
-    rtts[RTT_HALF1] = drv->addRenderTargetTexture(half, "rtt.half1", ECF_A8R8G8B8, stencil);
-    rtts[RTT_HALF2] = drv->addRenderTargetTexture(half, "rtt.half2", ECF_A8R8G8B8, stencil);
+    rtts[RTT_HALF1] = drv->addRenderTargetTexture(half, "rtt.half1", ECF_A16B16G16R16F, stencil);
+    rtts[RTT_HALF2] = drv->addRenderTargetTexture(half, "rtt.half2", ECF_A16B16G16R16F, stencil);
 
-    rtts[RTT_QUARTER1] = drv->addRenderTargetTexture(quarter, "rtt.q1", ECF_A8R8G8B8, stencil);
-    rtts[RTT_QUARTER2] = drv->addRenderTargetTexture(quarter, "rtt.q2", ECF_A8R8G8B8, stencil);
-    rtts[RTT_QUARTER3] = drv->addRenderTargetTexture(quarter, "rtt.q3", ECF_A8R8G8B8, stencil);
-    rtts[RTT_QUARTER4] = drv->addRenderTargetTexture(quarter, "rtt.q4", ECF_R8, stencil);
+    rtts[RTT_QUARTER1] = drv->addRenderTargetTexture(quarter, "rtt.q1", ECF_A16B16G16R16F, stencil);
+    rtts[RTT_QUARTER2] = drv->addRenderTargetTexture(quarter, "rtt.q2", ECF_A16B16G16R16F, stencil);
+    rtts[RTT_QUARTER3] = drv->addRenderTargetTexture(quarter, "rtt.q3", ECF_A16B16G16R16F, stencil);
+    rtts[RTT_QUARTER4] = drv->addRenderTargetTexture(quarter, "rtt.q4", ECF_R16F, stencil);
 
-    rtts[RTT_EIGHTH1] = drv->addRenderTargetTexture(eighth, "rtt.e1", ECF_A8R8G8B8, stencil);
-    rtts[RTT_EIGHTH2] = drv->addRenderTargetTexture(eighth, "rtt.e2", ECF_A8R8G8B8, stencil);
+    rtts[RTT_EIGHTH1] = drv->addRenderTargetTexture(eighth, "rtt.e1", ECF_A16B16G16R16F, stencil);
+    rtts[RTT_EIGHTH2] = drv->addRenderTargetTexture(eighth, "rtt.e2", ECF_A16B16G16R16F, stencil);
 
-    rtts[RTT_SIXTEENTH1] = drv->addRenderTargetTexture(sixteenth, "rtt.s1", ECF_A8R8G8B8, stencil);
-    rtts[RTT_SIXTEENTH2] = drv->addRenderTargetTexture(sixteenth, "rtt.s2", ECF_A8R8G8B8, stencil);
+    rtts[RTT_SIXTEENTH1] = drv->addRenderTargetTexture(sixteenth, "rtt.s1", ECF_A16B16G16R16F, stencil);
+    rtts[RTT_SIXTEENTH2] = drv->addRenderTargetTexture(sixteenth, "rtt.s2", ECF_A16B16G16R16F, stencil);
 
-    rtts[RTT_SSAO] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao", ECF_R8, stencil);
+    rtts[RTT_SSAO] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao", ECF_R16F, stencil);
 
-    rtts[RTT_WARPV] = drv->addRenderTargetTexture(warpvsize, "rtt.warpv", ECF_A8R8G8B8, stencil);
-    rtts[RTT_WARPH] = drv->addRenderTargetTexture(warphsize, "rtt.warph", ECF_A8R8G8B8, stencil);
+    rtts[RTT_WARPV] = drv->addRenderTargetTexture(warpvsize, "rtt.warpv", ECF_A16B16G16R16F, stencil);
+    rtts[RTT_WARPH] = drv->addRenderTargetTexture(warphsize, "rtt.warph", ECF_A16B16G16R16F, stencil);
 
-    rtts[RTT_DISPLACE] = drv->addRenderTargetTexture(res, "rtt.displace", ECF_A8R8G8B8, stencil);
+    rtts[RTT_DISPLACE] = drv->addRenderTargetTexture(res, "rtt.displace", ECF_A16B16G16R16F, stencil);
 
     if (((COpenGLDriver *) drv)->queryOpenGLFeature(COpenGLDriver::IRR_ARB_texture_rg))
     {
