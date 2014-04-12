@@ -170,7 +170,7 @@ void IrrDriver::renderGLSL(float dt)
 
         // Fire up the MRT
         PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
-        renderSolidFirstPass();
+        //renderSolidFirstPass();
         PROFILER_POP_CPU_MARKER();
 
 
@@ -449,10 +449,11 @@ void IrrDriver::renderSolidSecondPass()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COLORS));
     SColor clearColor = World::getWorld()->getClearColor();
+    glDepthMask(GL_TRUE);
     glClearColor(clearColor.getRed()  / 255.f, clearColor.getGreen() / 255.f,
                  clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDepthMask(GL_FALSE);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    glDepthMask(GL_FALSE);
 
     irr_driver->setPhase(SOLID_LIT_PASS);
     glEnable(GL_DEPTH_TEST);
@@ -502,7 +503,6 @@ void IrrDriver::renderSolidSecondPass()
     glUseProgram(MeshShader::UntexturedObjectShader::Program);
     for (unsigned i = 0; i < GroupedSM<SM_UNTEXTURED>::MeshSet.size(); i++)
         drawUntexturedObject(*GroupedSM<SM_UNTEXTURED>::MeshSet[i], GroupedSM<SM_UNTEXTURED>::MVPSet[i]);
-
 }
 
 void IrrDriver::renderTransparent()
@@ -858,7 +858,12 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     gl_driver->extGlDrawBuffers(2, bufs);
+//    glClear(GL_COLOR_BUFFER_BIT);
+//    return;
+    glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0., 0., 0., 0.);
+    return;
 
     const u32 lightcount = m_lights.size();
     const core::vector3df &campos =
